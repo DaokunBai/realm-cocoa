@@ -98,6 +98,8 @@ static bool rawTypeIsComputedProperty(NSString *rawType) {
         _linkOriginPropertyName = linkOriginPropertyName;
         _indexed = indexed;
         _optional = optional;
+#warning TODO: this is used to init a schema from object store schema. What to do about int vs counter?
+        _subtype = RLMPropertyInternalSubtypeNone;
         [self updateAccessors];
     }
 
@@ -186,6 +188,10 @@ static bool rawTypeIsComputedProperty(NSString *rawType) {
                                 @"RLMArrays can only contain instances of RLMObject subclasses. "
                                 @"See https://realm.io/docs/objc/latest/#to-many for more information.", _name, _objectClassName);
         }
+    }
+    else if (strcmp(code, "@\"RLMInteger\"") == 0) {
+        _type = RLMPropertyTypeInt;
+        _subtype = RLMPropertyInternalSubtypeInteger;
     }
     else if (strncmp(code, numberPrefix, numberPrefixLen) == 0) {
         // get number type from type string - @"NSNumber<objectClassName>"
@@ -310,6 +316,7 @@ static bool rawTypeIsComputedProperty(NSString *rawType) {
 
     _name = name;
     _indexed = indexed;
+    _subtype = RLMPropertyInternalSubtypeNone;
 
     if (linkPropertyDescriptor) {
         _objectClassName = [linkPropertyDescriptor.objectClass className];
@@ -406,6 +413,7 @@ static bool rawTypeIsComputedProperty(NSString *rawType) {
 
     _name = name;
     _indexed = indexed;
+    _subtype = RLMPropertyInternalSubtypeNone;
 
     if (linkPropertyDescriptor) {
         _objectClassName = [linkPropertyDescriptor.objectClass className];
@@ -448,6 +456,7 @@ static bool rawTypeIsComputedProperty(NSString *rawType) {
     _type = RLMPropertyTypeArray;
     _objectClassName = objectClassName;
     _swiftIvar = ivar;
+    _subtype = RLMPropertyInternalSubtypeNone;
 
     // no obj-c property for generic lists, and thus no getter/setter names
 
@@ -468,6 +477,7 @@ static bool rawTypeIsComputedProperty(NSString *rawType) {
     _indexed = indexed;
     _swiftIvar = ivar;
     _optional = true;
+    _subtype = RLMPropertyInternalSubtypeNone;
 
     // no obj-c property for generic optionals, and thus no getter/setter names
 
@@ -488,6 +498,7 @@ static bool rawTypeIsComputedProperty(NSString *rawType) {
     _objectClassName = objectClassName;
     _linkOriginPropertyName = linkOriginPropertyName;
     _swiftIvar = ivar;
+    _subtype = RLMPropertyInternalSubtypeNone;
 
     // no obj-c property for generic linking objects properties, and thus no getter/setter names
 
@@ -508,6 +519,7 @@ static bool rawTypeIsComputedProperty(NSString *rawType) {
     prop->_swiftIvar = _swiftIvar;
     prop->_optional = _optional;
     prop->_linkOriginPropertyName = _linkOriginPropertyName;
+    prop->_subtype = _subtype;
 
     return prop;
 }
@@ -528,6 +540,7 @@ static bool rawTypeIsComputedProperty(NSString *rawType) {
 
 - (BOOL)isEqualToProperty:(RLMProperty *)property {
     return _type == property->_type
+        && _subtype == property->_subtype
         && _indexed == property->_indexed
         && _isPrimary == property->_isPrimary
         && _optional == property->_optional

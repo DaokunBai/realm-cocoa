@@ -19,6 +19,7 @@
 #import "RLMAccessor.h"
 
 #import "RLMArray_Private.hpp"
+#import "RLMInteger.h"
 #import "RLMListBase.h"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObjectStore.h"
@@ -279,6 +280,13 @@ static id RLMAccessorGetter(RLMProperty *prop, const char *type) {
     bool boxed = prop.optional || *type == '@';
     switch (prop.type) {
         case RLMPropertyTypeInt:
+            if (prop.subtype == RLMPropertyInternalSubtypeInteger) {
+                if (prop.optional) {
+#warning TODO: implement this
+                } else {
+#warning TODO: implement this
+                }
+            }
             if (boxed) {
                 return ^(__unsafe_unretained RLMObjectBase *const obj) {
                     return getBoxed<long long>(obj, index);
@@ -398,6 +406,9 @@ static id RLMAccessorSetter(RLMProperty *prop, const char *type) {
     bool boxed = prop.optional || *type == '@';
     switch (prop.type) {
         case RLMPropertyTypeInt:
+            if (prop.subtype == RLMPropertyInternalSubtypeInteger) {
+                @throw RLMException(@"Realm integer properties cannot be reset; use the APIs.");
+            }
             if (boxed) {
                 return makeSetter<NSNumber<RLMInt> *>(prop);
             }
@@ -563,9 +574,11 @@ static Class RLMCreateAccessorClass(Class objectClass,
 
     // override getters/setters for each propery
     for (RLMProperty *prop in schema.properties) {
+#warning TODO: need to account for the additional methods a Counter needs
         addMethod(accClass, prop, getterGetter, setterGetter);
     }
     for (RLMProperty *prop in schema.computedProperties) {
+#warning TODO: need to account for the additional methods a Counter needs
         addMethod(accClass, prop, getterGetter, setterGetter);
     }
 

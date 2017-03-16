@@ -22,6 +22,11 @@
 
 @class RLMObjectBase;
 
+typedef enum : NSUInteger {
+    RLMPropertyInternalSubtypeNone = 0,
+    RLMPropertyInternalSubtypeInteger,
+} RLMPropertyInternalSubtype;
+
 NS_ASSUME_NONNULL_BEGIN
 
 BOOL RLMPropertyTypeIsNullable(RLMPropertyType propertyType);
@@ -71,6 +76,7 @@ FOUNDATION_EXTERN void RLMValidateSwiftPropertyName(NSString *name);
 @property (nonatomic, assign) NSUInteger index;
 @property (nonatomic, assign) BOOL isPrimary;
 @property (nonatomic, assign) Ivar swiftIvar;
+@property (nonatomic) RLMPropertyInternalSubtype subtype;
 
 // getter and setter names
 @property (nonatomic, copy) NSString *getterName;
